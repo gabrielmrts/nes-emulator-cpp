@@ -1,50 +1,43 @@
-#include "../memory/memory.h"
+#include "cpu.h"
 
-struct Registers {
-    u8 A; // Accumulator
-    u16 X, Y; // General purpose registers
-    u16 PC; // Program Counter
-    u8 P; // Processor Status Register
-    u8 IR; // Instruction Register
-    u16 DBR; // Data Bank Register
-    u16 PBR; // Program Bank Register
-    u16 S; // Stack Pointer
+CPU* CPU::cpu_ = nullptr;
 
-    u8 FLAG_N = 0x80;
-    u8 FLAG_V = 0x40;
-    u8 FLAG_B = 0x10; 
-    u8 FLAG_D = 0x08; 
-    u8 FLAG_I = 0x04; 
-    u8 FLAG_Z = 0x02; 
-    u8 FLAG_C = 0x01; 
-
-    void reset() {
-        A = P = IR = 0;
-        X = Y = DBR = PBR = PC = 0;
-        S = STACK_BASE_ADDRESS + STACK_SIZE - 1;
+CPU* CPU::GetInstance(const std::string &value) {
+    if (cpu_ == nullptr) {
+        cpu_ = new CPU(value);
     }
-};
 
-class CPU {
+    return cpu_;
+}
 
-    protected:
-        CPU(const std::string value): value_(value) {}
-        static CPU* cpu_;
+void CPU::executeInstruction(u8 opcode) {
+    switch (opcode) {
+        case 0x00:
+            this->registers->PC += 2;
+            break;
+        default:
+            break;
+    }
+}
 
-        std::string value_;
+void CPU::setFlag(u8 flag, bool value) {
+    if (value) {
+        this->registers->P |= flag;
+    } else {
+        this->registers->P &= ~flag;
+    }
+}
 
-    public:
-        CPU(CPU &other) = delete;
-        void operator = (const CPU &) = delete;
-        static CPU *GetInstance(const std::string &value);
+void CPU::ADC(u16 address)
+{
+    u8 value = this->memory->read(address); 
+    u16 sum = this->registers->A + value + (this->registers->P & this->registers->FLAG_C); 
+    
+    setFlag(this->registers->FLAG_N, sum & 0x80); 
+    setFlag(this->registers->FLAG_V, (~(this->registers->A ^ value) & (this->registers->A ^ sum)) & 0x80); 
+    setFlag(this->registers->FLAG_Z, (sum & 0xFF) == 0);  
+    setFlag(this->registers->FLAG_C, sum > 0xFF);
 
-        Registers* registers;
-        Memory* memory = Memory::GetInstance("main");
-
-        void reset();
-        void executeInstruction(u8 opcode);
-        void setFlag(u8 flag, bool value);
-
-        // Instructions
-        void ADC(u16 address);
-};
+    this->registers->A = sum & 0xFF; 
+    this->registers->PC += 2; 
+}

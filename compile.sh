@@ -1,0 +1,1 @@
+g++ main.cpp memory/memory.cpp stack/stack.cpp cpu/cpu.cpp && ./a.out

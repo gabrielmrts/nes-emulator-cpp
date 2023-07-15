@@ -2,6 +2,8 @@
 #include <fstream>
 #include <unistd.h>
 #include "stack/stack.h"
+#include "cpu/cpu.h"
+#include "memory/memory.h"
 
 using namespace std;
 
@@ -12,10 +14,10 @@ int main(int argc, const char* argv[]) {
 
     CPU* cpu = CPU::GetInstance("main");
     cpu->memory = memory;
-    cpu->reset();
 
     Stack* stack = Stack::GetInstance("main");
 
+    cpu->memory->dump();
     return 0;
 
 }   
