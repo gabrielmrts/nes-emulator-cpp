@@ -16,8 +16,12 @@ int main(int argc, const char* argv[]) {
     cpu->memory = memory;
 
     Stack* stack = Stack::GetInstance("main");
+    
+    cpu->memory->write(0x1000, 0x10);
+    cpu->registers->A = 0x20;
+    cpu->executeInstruction(0x6D, {0x1000});
+    cpu->showRegisters();
 
-    cpu->memory->dump();
     return 0;
 
 }   

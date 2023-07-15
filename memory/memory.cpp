@@ -25,6 +25,10 @@ u8 Memory::read(u16 address) {
     return raw[address];
 }
 
+int Memory::readInt(u16 address) {
+    return static_cast<int>(raw[address]);
+}
+
 void Memory::loadRom(const std::string& romFilename) {
     std::ifstream romFile(romFilename, std::ios::binary);
     

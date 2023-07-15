@@ -25,10 +25,8 @@ class Memory {
         void dump();
 
         void write(u16 address, u8 value);
-
         u8 read(u16 address);
-
+        int readInt(u16 address);
         void loadRom(const std::string& romFilename);
-
         std::string value() const;
 };

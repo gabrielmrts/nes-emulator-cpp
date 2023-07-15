@@ -1,4 +1,5 @@
 #include "../memory/memory.h"
+#include <vector>
 #pragma once
 
 struct Registers {
@@ -49,16 +50,28 @@ class CPU {
         void operator = (const CPU &) = delete;
         static CPU *GetInstance(const std::string &value);
 
-        Registers* registers;
+        Registers regs;
+        Registers* registers = &regs;
+
         Memory* memory = Memory::GetInstance("main");
 
         CPU() {
+            this->registers = new Registers;
             this->registers->reset();
             this->registers->resetFlags();
         }
-        void executeInstruction(u8 opcode);
+        ~CPU() {
+            delete registers;
+        }
+
+        void executeInstruction(u8 opcode, std::vector<u16> addresses);
         void setFlag(u8 flag, bool value);
+        void showRegisters();
 
         // Instructions
         void ADC(u16 address);
+        void ADC_X(u16 address);
+        void ADC_Y(u16 address);
+        void ADC_AL(u16 addr1, u16 addr2, u16 baddr);
+        void SetADCFlags(u8 value, u16 sum);
 };
